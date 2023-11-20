@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            let prevNow = performance.now()
+            var kõrv = 0;
+            var kõrvPC = 1;
+            var kõrvTT = 0;
+            var up1CS = 10;
+            var up1AM = 0;
+
+            var up2CS = 15;
+            var up2AM = 0;
+
+            var up3CS = 30;
+            var up3AM = 0;
+
+            function loadGame() {
+                const savedData = JSON.parse(getCookie("gameData"));
+                if (savedData) {
+                    KÕRV = savedData.kõrv;
+                    KÕRVPC = savedData.kõrvPC;
+                    KÕRVTT = savedData.kõrvTT;
+
+                    UP1CS = savedData.up1CS;
+                    UP1AM = savedData.up1AM;
+
+                    UP2CS = savedData.up2CS;
+                    UP2AM = savedData.up2AM;
+
+                    UP3CS = savedData.up3CS;
+                    UP3AM = savedData.up3AM;
+                }
+            }
+
+            function saveGame() {
+                const gameData = {
+                    KÕRV: kõrv.toString(),
+                    KÕRVPC: kõrvPC.toString(),
+                    KÕRVTT: kõrvTT.toString(),
+
+                    UP1CS: up1CS.toString(),
+                    UP1AM: up1AM.toString(),
+
+                    UP2CS: up2CS.toString(),
+                    UP2AM: up2AM.toString(),
+
+                    UP3CS: up3CS.toString(),
+                    UP3AM: up3AM.toString(),
+                };
+                setCookie("gameData", JSON.stringify(gameData));
+            }
+
+            function getCookie(cookieName) {
+                const name = cookieName + "=";
+                const decodedCookie = decodeURIComponent(document.cookie);
+                const cookieArray = decodedCookie.split(";");
+                for (let i = 0; i < cookieArray.length; i++) {
+                    let cookie = cookieArray[i];
+                    while (cookie.charAt(0) === " ") {
+                        cookie = cookie.substring(1);
+                    }
+                    if (cookie.indexOf(name) === 0) {
+                        return cookie.substring(name.length, cookie.length);
+                    }
+                }
+                return ""
+            }
+
+            function setCookie(cookieName, cookieValue) {
+                const expirationDate = new Date();
+                expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+                document.cookie = `${cookieName}=${cookieValue};expires=${expirationDate.toUTCString()};path=/;SameSite=Lax;Secure`
+            }
+
+            function kõrvG() {
+                kõrvPCC = 1 * (up1AM + 1)
+                kõrvPC = kõrvPCC;
+                kõrv = kõrv += kõrvPC;
+                kõrvTT = kõrvTT += kõrvPC;
+            }
+
+            function buyU1() {
+                if (kõrv >= up1CS) {
+                    up1AM++;
+                    kõrv = kõrv -= up1CS;
+                }
+            }
+
+            function buyU2() {
+                if (kõrv >= up2CS) {
+                    up2AM++;
+                    kõrv = kõrv -= up2CS;
+                }
+            }
+
+            function buyU3() {
+                if (kõrv >= up3CS) {
+                    up3AM++;
+                    kõrv = kõrv -= up3CS;
+                }
+            }
+
+            function updateDI() {
+                let up1CSC = 10 * (2 ** up1AM)
+                up1CS = up1CSC
+
+                let up2CSC = 15 * (1.5 ** up2AM)
+                up2CS = up2CSC
+
+                let up3CSC = 30 * (5 ** up3AM)
+                up3CS = up3CSC
+
+                document.getElementById("kõrvKG").textContent = kõrv.toFixed(0)
+                document.getElementById("kõrvPC").textContent = kõrvPC.toFixed(0)
+                document.getElementById("u1-c").textContent = up1CS.toFixed(2)
+                document.getElementById("u2-c").textContent = up2CS.toFixed(2)
+                document.getElementById("u3-c").textContent = up3CS.toFixed(2)
+            }
+
+            function kõrvaloop(dT) {
+                let kõrvR = 0;
+                let up2AMR = 1;
+                up2AMR = up2AMR += up3AM
+                up2AM = up2AMR
+                kõrvR = kõrvR += up2AM
+
+                kõrv = kõrv += ( kõrvR * dT )
+            }
+
+            setInterval(function() {
+                let now = performance.now()
+                let dT = (now - prevNow) / 1000
+                prevNow = now
+
+                updateDI(dT)
+                kõrvaloop(dT)
+            }, 33)
+
+            loadGame();
+        </script>
+
+        <style>
+            .main-cont {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                left: 10%;
+                height: 200px;
+                position: absolute;
+            }
+
+            #kõrv-btn {
+                position: absolute;
+                left: 10%;
+                top: 100px;
+                width: 100px;
+            }
+
+            #buy-u1-btn {
+                position: absolute;
+                left: 10%;
+                top: 150px;
+                width: 200px;
+            }
+
+            #buy-u2-btn {
+                position: absolute;
+                left: 10%;
+                top: 200px;
+                width: 200px;
+            }
+
+            #buy-u3-btn {
+                position: absolute;
+                left: 10%;
+                top: 250px;
+                width: 200px;
+            }
+
+            #kõrv-txt {
+                position: absolute;
+                left: 10%;
+                width: 250px;
+            }
+
+            #save-btn , #load-btn {
+                float: left;
+
+            }
+
+            #save-btn {
+                left: 200px;
+                position: absolute;
+            }
+
+            #load-btn {
+                left: 250px;
+                position: absolute;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main-cont">
+            <span id="kõrv-txt">
+                <span id="kõrvKG">0</span> kõrv
+            </span>
+            <button id="save-btn" onclick="saveGame()">
+                Save
+            </button>
+            <button id="load-btn" onclick="loadGame()">
+                Load
+            </button>
+            <br>
+            <button id="kõrv-btn" onclick="kõrvG()">
+            Vajuta mind<br>
+            + <span id="kõrvPC">0</span> kõrv
+        </button>
+            <br><br>
+            <button id="buy-u1-btn" onclick="buyU1()">
+            Osta inimesi juurde<br>
+            Maksa <span id="u1-c">10</span> kõrva
+            </button>
+            <br><br>
+            <button id="buy-u2-btn" onclick="buyU2()">
+            Propageeri kõrvade müüki<br>
+            Maksa <span id="u2-c">10</span> kõrva
+            </button>
+            <br><br>
+            <button id="buy-u3-btn" onclick="buyU3()">
+            Tee televisioonisaade kõrvade kohta<br>
+            Maksa <span id="u3-c">10</span> kõrva
+            </button>
+        </div>
+    </body>
+</html>
